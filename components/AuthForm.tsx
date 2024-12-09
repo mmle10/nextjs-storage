@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input"
 import Image from 'next/image'
 import Link from 'next/link'
 import { createAccount } from '@/lib/actions/user.action'
+import OTPModal from './OTPModal'
 
 
 type FormType = "sign-up" | "sign-in"
@@ -133,6 +134,7 @@ console.log(accountId)
                     </div>
                 </form>
             </Form>
+            {accountId && <OTPModal accountId={accountId} email={form.getValues("email")} />}
 
         </>
     )
