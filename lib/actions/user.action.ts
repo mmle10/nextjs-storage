@@ -5,7 +5,7 @@ import { Query, ID } from "node-appwrite";
 import { parseStringify } from "@/lib/utils";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { createAdminClient } from "..";
+import { createAdminClient, createSessionClient } from "..";
 
 const getUserByEmail = async (email: string) => {
   const { databases } = await createAdminClient();
@@ -37,10 +37,10 @@ export const sendEmailOTP = async ({ email }: { email: string }) => {
 };
 
 export const createAccount = async ({
-  username,
+  fullName,
   email,
 }: {
-  username: string;
+  fullName: string;
   email: string;
 }) => {
   const existingUser = await getUserByEmail(email);
@@ -56,7 +56,7 @@ export const createAccount = async ({
       appwriteConfig.usersCollectionId,
       ID.unique(),
       {
-        username,
+        fullName,
         email,
         avatar:
           "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png",
@@ -91,4 +91,17 @@ export const verifySecret = async ({
   } catch (error) {
     handleError(error, "Failed to verify OTP");
   }
+};
+
+export const getCurrentUser = async () => {
+  const { databases, account } = await createSessionClient();
+  const result = await account.get();
+  const user = await databases.listDocuments(
+    appwriteConfig.databaseId,
+    appwriteConfig.usersCollectionId,
+    [Query.equal("accountId", [result.$id])]
+  );
+  if (user.total <= 0) return null;
+
+  return parseStringify(user.documents[0]);
 };

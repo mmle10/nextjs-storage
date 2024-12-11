@@ -28,7 +28,7 @@ type FormType = "sign-up" | "sign-in"
 
 const authSchema = (formType: FormType) => {
     return z.object({
-        username: formType === "sign-up" ? z.string().min(2).max(50) : z.string().optional(),
+        fullName: formType === "sign-up" ? z.string().min(2).max(50) : z.string().optional(),
         email: z.string().email(),
     })
 }
@@ -42,7 +42,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            username: "",
+            fullName: "",
             email: ""
         },
     })
@@ -53,7 +53,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
         SetErrorMessage("")
         try {
             console.log(values)
-            const user = await createAccount({ username: values.username || "", email: values.email })
+            const user = await createAccount({ fullName: values.fullName || "", email: values.email })
             setAccountId(user.accountId)
 
         } catch (error) {
@@ -73,7 +73,7 @@ console.log(accountId)
                     {type === "sign-up" && <FormField
 
                         control={form.control}
-                        name="username"
+                        name="fullName"
                         render={({ field }) => (
                             <FormItem>
                                 <div className="shad-form-item">
